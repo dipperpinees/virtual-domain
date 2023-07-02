@@ -1,22 +1,23 @@
 import { spawn } from 'child_process';
-import kill from 'kill-port';
+import path from 'path';
 import startCerts from "../utils/certs";
 import startHosts from "../utils/hosts";
-import path from 'path';
+import killProcess from '../utils/killProcess';
 
 export const startServer = async () => {
     startCerts();
     startHosts();
     await stopServer();
 
-    const childProcess = spawn('node', [path.join(__dirname, "./server.ts")], {
+    const childProcess = spawn('node', [path.join(__dirname, "./logging.js")], {
         detached: true,
         stdio: 'ignore',
     });
+    
     childProcess.unref();
 };
 
 export const stopServer = async () => {
-    await kill(80, 'tcp');
-    await kill(443, 'tcp');
+    await killProcess(80);
+    await killProcess(443);
 };

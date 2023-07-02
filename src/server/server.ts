@@ -15,7 +15,7 @@ const proxy = redbird({
 for (const config of configs.getEnable()) {
     proxy.register(config.domain, `http://${config.localIP}:${config.port}`, {
         ssl: {
-            port: 443,
+            port: 8443,
             key: `./certs/${config.domain}-key.pem`,
             cert: `./certs/${config.domain}.pem`,
         },

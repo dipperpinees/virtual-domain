@@ -7,11 +7,11 @@ import { IConfig } from '../../types/config';
 export const create = async (str: string, options: {ip?: string, port: number, domain: string}) => {
     if (!options.domain) {
         console.error(colors.red('DOMAIN cannot be left blank'));
-        return;
+        process.exit(1);
     }
     if (!options.port) {
         console.error(colors.red('PORT cannot be left blank'));
-        return;
+        process.exit(1);
     }
     try {
         const newConfig: IConfig = {
@@ -31,6 +31,7 @@ export const create = async (str: string, options: {ip?: string, port: number, d
             errorMessage = err.message;
         }
         console.error(colors.red(errorMessage));
+        process.exit(1);
     }
 };
 
@@ -50,6 +51,7 @@ export const remove = async (str: string) => {
             errorMessage = err.message;
         }
         console.error(colors.red(errorMessage));
+        process.exit(1);
     }
 };
 
@@ -69,6 +71,7 @@ export const enable = async (str: string) => {
             errorMessage = err.message;
         }
         console.error(colors.red(errorMessage));
+        process.exit(1);
     }
 };
 
@@ -88,6 +91,7 @@ export const disable = async (str: string) => {
             errorMessage = err.message;
         }
         console.error(colors.red(errorMessage));
+        process.exit(1);
     }
 };
 
