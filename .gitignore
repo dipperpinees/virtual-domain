@@ -2,3 +2,4 @@ node_modules/
 dist/
 configs.json
 certs/
+bin/

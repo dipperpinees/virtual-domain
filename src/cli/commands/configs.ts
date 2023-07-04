@@ -13,9 +13,16 @@ export default (program: Command) => {
     program
         .command('add')
         .description('Add config')
-        .argument('name', 'Config name')
-        .option('-d, --domain <value>')
+        .argument('domain', 'Virtual domain')
         .option('-i, --ip <value>')
         .option('-p, --port <value>')
         .action(configsHandler.create);
+
+    program
+        .command('update')
+        .description('Update config')
+        .argument('domain', 'Virtual domain')
+        .option('-i, --ip <value>')
+        .option('-p, --port <value>')
+        .action(configsHandler.update);
 };

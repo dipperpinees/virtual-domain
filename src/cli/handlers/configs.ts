@@ -1,32 +1,50 @@
 import Table from 'cli-table';
 import colors from 'colors';
-import configs from "../../configs";
-import { startServer } from "../../server";
+import configs from '../../configs';
 import { IConfig } from '../../types/config';
 
-export const create = async (str: string, options: {ip?: string, port: number, domain: string}) => {
-    if (!options.domain) {
-        console.error(colors.red('DOMAIN cannot be left blank'));
-        process.exit(1);
-    }
+export const create = async (domain: string, options: { ip?: string; port: number }) => {
     if (!options.port) {
         console.error(colors.red('PORT cannot be left blank'));
         process.exit(1);
     }
     try {
         const newConfig: IConfig = {
-            name: str,
-            domain: options.domain,
+            domain,
             port: options.port,
             localIP: options.ip || '127.0.0.1',
             status: true,
-        }
+        };
         configs.add(newConfig);
-        await startServer();
         console.log(colors.green('Create config successfully'));
         display();
     } catch (err) {
-        let errorMessage = "Failed to create config";
+        let errorMessage = 'Failed to create config';
+        if (err instanceof Error) {
+            errorMessage = err.message;
+        }
+        console.error(colors.red(errorMessage));
+        process.exit(1);
+    }
+};
+
+export const update = async (domain: string, options: { ip?: string; port: number }) => {
+    if (!options.port) {
+        console.error(colors.red('PORT cannot be left blank'));
+        process.exit(1);
+    }
+    try {
+        const updateConfig: IConfig = {
+            domain,
+            port: options.port,
+            localIP: options.ip || '127.0.0.1',
+            status: true,
+        };
+        configs.update(updateConfig);
+        console.log(colors.green('Update config successfully'));
+        display();
+    } catch (err) {
+        let errorMessage = 'Failed to update config';
         if (err instanceof Error) {
             errorMessage = err.message;
         }
@@ -40,13 +58,12 @@ export const remove = async (str: string) => {
         if (/^\d+$/.test(str)) {
             configs.removeByID(parseInt(str));
         } else {
-            configs.removeByName(str);
+            configs.removeByDomain(str);
         }
-        await startServer();
         console.log(colors.green(`Delete ${str} successfully`));
         display();
     } catch (err) {
-        let errorMessage = "Failed to remove config";
+        let errorMessage = 'Failed to remove config';
         if (err instanceof Error) {
             errorMessage = err.message;
         }
@@ -60,13 +77,12 @@ export const enable = async (str: string) => {
         if (/^\d+$/.test(str)) {
             configs.startByID(parseInt(str));
         } else {
-            configs.startByName(str);
+            configs.startByDomain(str);
         }
-        await startServer();
         console.log(colors.green(`Enable ${str} successfully`));
         display();
     } catch (err) {
-        let errorMessage = "Failed to enable config";
+        let errorMessage = 'Failed to enable config';
         if (err instanceof Error) {
             errorMessage = err.message;
         }
@@ -80,13 +96,12 @@ export const disable = async (str: string) => {
         if (/^\d+$/.test(str)) {
             configs.stopByID(parseInt(str));
         } else {
-            configs.stopByName(str);
+            configs.stopByDomain(str);
         }
-        await startServer();
         console.log(colors.green(`Disable ${str} successfully`));
         display();
     } catch (err) {
-        let errorMessage = "Failed to disable config";
+        let errorMessage = 'Failed to disable config';
         if (err instanceof Error) {
             errorMessage = err.message;
         }
@@ -97,7 +112,7 @@ export const disable = async (str: string) => {
 
 export const display = () => {
     const table = new Table({
-        head: ['ID', 'Name', 'Status', 'Domain', 'LocalIP', 'Port'],
+        head: ['ID', 'Host', 'Status', 'LocalIP', 'Port'],
         chars: {
             top: '═',
             'top-mid': '╤',
@@ -116,15 +131,14 @@ export const display = () => {
             middle: '│',
         },
     });
-    
+
     table.push(
         ...configs
             .getAll()
-            .map(({ id, name, status, domain, localIP, port }) => [
+            .map(({ id, status, domain, localIP, port }) => [
                 `${id}`,
-                name,
-                status ? 'enabled' : 'disabled',
                 domain,
+                status ? 'enabled' : 'disabled',
                 localIP,
                 `${port}`,
             ])

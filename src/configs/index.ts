@@ -1,13 +1,16 @@
 import fs from 'fs';
 import { IConfig } from '../types/config';
+import path from 'path';
+import os from "os";   
 
 class Configs {
     data: IConfig[];
+    configPath: string = path.join(os.homedir(), ".bss-configs.json");
     constructor() {
         try {
-            this.data = JSON.parse(fs.readFileSync('configs.json', 'utf8'));
+            this.data = JSON.parse(fs.readFileSync(this.configPath, 'utf8'));
         } catch (err) {
-            this.data = []
+            this.data = [];
         }
     }
 
@@ -20,11 +23,8 @@ class Configs {
     }
 
     add(config: IConfig) {
-        if (this.data.find(({ name }) => name === config.name)) {
-            throw new Error('This name already exists');
-        }
         if (this.data.find(({ domain }) => domain === config.domain)) {
-            throw new Error('This domain already exists');
+            throw new Error('This config already exists');
         }
         const lastConfig = this.data[this.data.length - 1];
         if (lastConfig && lastConfig.id !== undefined) {
@@ -33,53 +33,64 @@ class Configs {
             config.id = 0
         }
         this.data.push(config);
-        this.update();
+        this.updateFile();
+    }
+
+    update(config: IConfig) {
+        const currentConfig = this.data.find(({ domain }) => domain === config.domain);
+        if (currentConfig) {
+            if (config.port === currentConfig.port) return;
+            currentConfig.port = config.port;
+            this.updateFile();
+            return;
+        }
+        this.add(config);
     }
 
     removeByID(id: number) {
         const config = this.data.find((config) => config.id === id);
         if (!config) throw new Error(`Config ${id} not found`);
         this.data.splice(this.data.indexOf(config), 1);
-        this.update();
+        this.updateFile();
     }
 
-    removeByName(name: string) {
-        const config = this.data.find((config) => config.name === name);
-        if (!config) throw new Error(`Config ${name} not found`);
+    removeByDomain(domain: string) {
+        const config = this.data.find((config) => config.domain === domain);
+        if (!config) throw new Error(`Config ${domain} not found`);
         this.data.splice(this.data.indexOf(config), 1);
-        this.update();
+        this.updateFile();
     }
 
     startByID(id: number) {
         const config = this.data.find((config) => config.id === id);
         if (!config) throw new Error(`Config ${id} not found`);
         config.status = true;
-        this.update();
+        this.updateFile();
     }
 
-    startByName(name: string) {
-        const config = this.data.find((config) => config.name === name);
-        if (!config) throw new Error(`Config ${name} not found`);
+    startByDomain(domain: string) {
+        const config = this.data.find((config) => config.domain === domain);
+        if (!config) throw new Error(`Config ${domain} not found`);
         config.status = true;
-        this.update();
+        this.updateFile();
     }
 
     stopByID(id: number) {
         const config = this.data.find((config) => config.id === id);
         if (!config) throw new Error(`Config ${id} not found`);
         config.status = false;
-        this.update();
+        this.updateFile();
     }
 
-    stopByName(name: string) {
-        const config = this.data.find((config) => config.name === name);
-        if (!config) throw new Error(`Config ${name} not found`);
+    stopByDomain(domain: string) {
+        const config = this.data.find((config) => config.domain === domain);
+        if (!config) throw new Error(`Config ${domain} not found`);
         config.status = false;
-        this.update();
+        this.updateFile();
     }
 
-    update() {
-        fs.writeFileSync('configs.json', JSON.stringify(this.data));
+    updateFile() {
+        fs.writeFileSync(this.configPath, JSON.stringify(this.data));
     }
 }
 

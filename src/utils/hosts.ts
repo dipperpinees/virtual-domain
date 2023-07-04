@@ -2,9 +2,20 @@ import sudo from 'sudo-prompt';
 import fs from 'fs';
 import configs from '../configs';
 
+const getHostsPath = () => {
+    switch (process.platform) {
+        case "win32":
+            return 'C:\\Windows\\System32\\drivers\\etc\\hosts'
+        case "linux":
+            return '/etc/hosts';
+        default:
+            console.error("Failed to add virtual host!!");
+            process.exit(1);
+    }
+}
+
 export default () => {
-    const platform = process.platform;
-    const hostsPath = platform === 'win32' ? 'C:\\Windows\\System32\\drivers\\etc\\hosts' : '/etc/hosts';
+    const hostsPath = getHostsPath();
     const hostsData = fs.readFileSync(hostsPath, 'utf8');
 
     const applicationOptions = {

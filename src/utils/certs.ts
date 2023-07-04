@@ -1,10 +1,13 @@
 import { execSync } from 'child_process';
 import fs from 'fs';
 import configs from '../configs';
+import path from 'path';
+
+const certFolderPath = path.join(__dirname, "../../certs");
 
 const checkExists = (domain: string) => {
-    const certPart = `certs/${domain}.pem`;
-    const keyPart = `certs/${domain}-key.pem`;
+    const certPart = path.join(certFolderPath, `./${domain}.pem`);
+    const keyPart = path.join(certFolderPath, `./${domain}-key.pem`);
     if (fs.existsSync(certPart) && fs.existsSync(keyPart)) {
         const stats = fs.statSync(certPart);
         const fileCreatedTime = stats.ctime.getTime();
@@ -15,22 +18,19 @@ const checkExists = (domain: string) => {
 };
 
 export default () => {
-    if (!fs.existsSync('certs')) {
-        fs.mkdirSync('certs');
+    if (!fs.existsSync(certFolderPath)) {
+        fs.mkdirSync(certFolderPath);
     }
     for (const config of configs.getAll()) {
         if (checkExists(config.domain)) continue;
-        const result = execSync(`mkcert ${config.domain}`);
-        console.log(result.toString());
-        createCert(config.domain);
-    }
-};
+        if (process.platform === 'linux') {
+            const result = execSync(`cd ${certFolderPath} & ./bin/mkcert ${config.domain}`);
+            console.log(result.toString());
+        }
 
-export const createCert = (domain: string) => {
-    fs.rename(`${domain}-key.pem`, `certs/${domain}-key.pem`, (err) => {
-        if (err) console.error(err);
-    });
-    fs.rename(`${domain}.pem`, `certs/${domain}.pem`, (err) => {
-        if (err) console.error(err);
-    });
+        if (process.platform === 'win32') {
+            const result = execSync(`cd ${certFolderPath} & ..\\bin\\mkcert.exe ${config.domain}`);
+            console.log(result.toString());
+        }
+    }
 };

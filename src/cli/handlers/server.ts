@@ -2,6 +2,8 @@ import colors from 'colors';
 import { startServer, stopServer } from '../../server';
 import fs from 'fs';
 import { isPortReachable } from '../../utils/portProcess';
+import path from 'path';
+import os from 'os';
 
 export const start = async () => {
     try {
@@ -33,7 +35,8 @@ export const stop = async () => {
 
 export const readLogs = () => {
     try {
-        const data = fs.readFileSync('logs.txt', 'utf8');
+        const logsPath = path.join(os.homedir(), "./bss-logs.txt");
+        const data = fs.readFileSync(logsPath, 'utf8');
         console.log(data);
     } catch (err) {
         let errorMessage = 'Failed to read server logs';

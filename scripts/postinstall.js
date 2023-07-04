@@ -1,39 +1,52 @@
 const { execSync } = require('child_process');
-const sudo = require('sudo-prompt');
+const path = require('path');
+const fs = require('fs');
+const util = require('util');
+const { pipeline } = require('stream');
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-const installForLinux = () => {
-    const exec = (command) => {
-        execSync(command, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`${error}`);
-                return;
-            }
-            console.error(`${stderr}`);
-        });
-    };
-    exec('curl -JLO "https://dl.filippo.io/mkcert/latest?for=linux/amd64"');
-    exec('chmod +x mkcert-v*-linux-amd64');
-    exec('sudo mv mkcert-v*-linux-amd64 /usr/local/bin/mkcert');
-    exec('mkcert -install');
-    console.log('Install mkcert successfully!!');
+async function downloadFile(url, to) {
+    if (!fs.existsSync(path.dirname(to))) {
+        fs.mkdirSync(path.dirname(to));
+    }
+    const streamPipeline = util.promisify(pipeline);
+    const response = await fetch(url, { redirect: 'follow' });
+    if (!response.ok) throw new Error("Couldn't download file");
+    const fileObject = fs.createWriteStream(to);
+    await streamPipeline(response.body, fileObject);
+    return to;
+}
+
+const exec = (command) => {
+    execSync(command, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`${error}`);
+            return;
+        }
+        console.log(stdout);
+        console.error(`${stderr}`);
+    });
 };
 
-const installForWindows = () => {
-    const options = {
-        name: 'Installing mkcert',
-    };
-    sudo.exec(
-        `Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1')) & choco install mkcert & mkcert -install`,
-        options,
-        function (error, stdout, stderr) {
-            if (error) {
-                console.error(error.message);
-                return;
-            };
-            console.log(stdout);
-            console.error(stderr);
-        }
-    );
+const installForLinux = async () => {
+    try {
+        await downloadFile('https://dl.filippo.io/mkcert/latest?for=linux/amd64', path.join(__dirname, '../bin/mkcert'));
+        exec('chmod +x ./bin/mkcert');
+        exec('./bin/mkcert -install');
+        console.log('Install mkcert successfully!!');
+    } catch (e) {
+        console.error(e.message);
+    }
+};
+
+const installForWindows = async () => {
+    try {
+        await downloadFile('https://dl.filippo.io/mkcert/latest?for=windows/amd64', path.join(__dirname, '../bin/mkcert.exe'));
+        exec(`.\\bin\\mkcert.exe -install`);
+        console.log('Install mkcert successfully!!');
+    } catch (e) {
+        console.error(e.message);
+    }
 };
 
 if (process.platform === 'linux') {
