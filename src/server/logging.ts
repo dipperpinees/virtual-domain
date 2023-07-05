@@ -1,12 +1,10 @@
 import { spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import os from "os";
-
-const logsPath = path.join(os.homedir(), "./bss-logs.txt");
+import { LOGS_PATH } from '../configs';
 
 const writeLogs = (data: string) => {
-    fs.appendFileSync(logsPath, data);
+    fs.appendFileSync(LOGS_PATH, data);
 };
 
 const childProcess = spawn("node", [path.join(__dirname, "./server.js")], {

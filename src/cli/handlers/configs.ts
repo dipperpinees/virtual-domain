@@ -1,6 +1,6 @@
 import Table from 'cli-table';
 import colors from 'colors';
-import configs from '../../configs';
+import {configs} from '../../configs';
 import { IConfig } from '../../types/config';
 
 export const create = async (domain: string, options: { ip?: string; port: number }) => {

@@ -1,5 +1,5 @@
 {
-    "name": "virtual-domain-proxy",
+    "name": "@bss/virtual-hosts",
     "version": "1.0.9",
     "main": "dist/index.js",
     "bin": {

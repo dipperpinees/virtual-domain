@@ -1,6 +1,6 @@
 import redbird from 'redbird';
-import configs from '../configs';
 import path from 'path';
+import {configs} from '../configs';
 
 if (!configs.getEnable().length) {
     process.exit(0);

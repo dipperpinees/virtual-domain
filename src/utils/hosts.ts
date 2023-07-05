@@ -1,6 +1,6 @@
 import sudo from 'sudo-prompt';
 import fs from 'fs';
-import configs from '../configs';
+import { configs } from '../configs';
 
 const getHostsPath = () => {
     switch (process.platform) {
