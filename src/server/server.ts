@@ -1,6 +1,6 @@
 import redbird from 'redbird';
 import path from 'path';
-import {configs} from '../configs';
+import {CERTS_DIR_PATH, configs} from '../configs';
 
 if (!configs.getEnable().length) {
     process.exit(0);
@@ -17,8 +17,8 @@ for (const config of configs.getEnable()) {
     proxy.register(config.domain, `http://${config.localIP}:${config.port}`, {
         ssl: {
             port: 443,
-            key: path.join(__dirname, `../../certs/${config.domain}-key.pem`),
-            cert: path.join(__dirname, `../../certs/${config.domain}.pem`),
+            key: path.join(CERTS_DIR_PATH, `./${config.domain}-key.pem`),
+            cert: path.join(CERTS_DIR_PATH, `./${config.domain}.pem`),
         },
     });
 }

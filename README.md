@@ -4,7 +4,7 @@ The Node.js Virtual Host Command Line Tool is a powerful utility that allows you
 
 # Installation
 ```bash
-  npm install -g @bss/virtual-host
+  npm install -g @bsscommerce/virtual-host
 ```
 
 # Command
