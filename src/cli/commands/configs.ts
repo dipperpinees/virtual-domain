@@ -14,8 +14,8 @@ export default (program: Command) => {
         .command('add')
         .description('Add config')
         .argument('domain', 'Virtual domain')
-        .option('-i, --ip <value>')
-        .option('-p, --port <value>')
+        .option('-i, --ip <value>', "Local IP")
+        .option('-p, --port <value>', "Local Port")
         .action(configsHandler.create);
 
     program

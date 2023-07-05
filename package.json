@@ -1,9 +1,9 @@
 {
-    "name": "@bss/virtual-hosts",
+    "name": "@bss/virtual-host",
     "version": "1.0.0",
     "main": "dist/index.js",
     "bin": {
-        "vdp": "./dist/index.js"
+        "virtual-host": "./dist/index.js"
     },
     "license": "MIT",
     "scripts": {
@@ -14,7 +14,8 @@
     },
     "files": [
         "dist",
-        "scripts"
+        "scripts",
+        "README.md"
     ],
     "author": "HiepNK",
     "devDependencies": {
