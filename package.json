@@ -1,6 +1,6 @@
 {
   "name": "@bsscommerce/virtual-host",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "main": "dist/index.js",
   "bin": {
     "virtual-host": "dist/index.js"
