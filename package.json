@@ -1,8 +1,9 @@
 {
-    "name": "@bsscommerce/tunnel",
+    "name": "@bss-sbc/tunnel",
     "version": "1.0.1",
     "main": "dist/index.js",
     "license": "MIT",
+    "description": "A simple npm package to run Cloudflare or ngrok tunnel for Shopify apps in Node.js",
     "scripts": {
         "test": "jest",
         "postinstall": "node ./scripts/postinstall.js",
