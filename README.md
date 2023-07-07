@@ -4,18 +4,18 @@ A simple npm package to run Cloudflare or ngrok tunnel for Shopify apps in Node.
 ## Installation
 Using npm:
 ```bash
-$ npm install --save-dev @bsscommerce/tunnel
+$ npm install --save-dev @bss-sbc/tunnel
 ```
 
 Using yarn:
 ```bash
-$ yarn add -D @bsscommerce/tunnel
+$ yarn add -D @bss-sbc/tunnel
 ```
 
 ## Usage
 Using Cloudflare tunnel:
 ```javascript
-const { useCloudflareTunnel } = require("@bsscommerce/tunnel");
+const { useCloudflareTunnel } = require("@bss-sbc/tunnel");
 (async () => {
   const tunnelUrl = await useCloudflareTunnel(8001);
   console.log("Tunnel url: ", tunnelUrl)
@@ -24,7 +24,7 @@ const { useCloudflareTunnel } = require("@bsscommerce/tunnel");
 
 Using ngrok tunnel:
 ```javascript
-const { useNgrokTunnel } = require("@bsscommerce/tunnel");
+const { useNgrokTunnel } = require("@bss-sbc/tunnel");
 (async () => {
   const tunnelUrl = await useNgrokTunnel({
     port: 8001,

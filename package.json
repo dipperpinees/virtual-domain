@@ -1,6 +1,6 @@
 {
     "name": "@bss-sbc/tunnel",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "main": "dist/index.js",
     "license": "MIT",
     "description": "A simple npm package to run Cloudflare or ngrok tunnel for Shopify apps in Node.js",
@@ -9,9 +9,17 @@
         "postinstall": "node ./scripts/postinstall.js",
         "build": "rimraf ./dist && tsc"
     },
+    "keywords": [
+        "shopify",
+        "shopify app",
+        "tunnel",
+        "cloudflare",
+        "ngrok"
+    ],
     "files": [
+        "dist",
         "scripts",
-        "src"
+        "README.md"
     ],
     "dependencies": {
         "isomorphic-fetch": "^3.0.0",
