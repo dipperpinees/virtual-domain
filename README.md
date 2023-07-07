@@ -15,7 +15,7 @@ $ yarn add -D @bsscommerce/tunnel
 ## Usage
 Using Cloudflare tunnel:
 ```javascript
-const {useCloudflareTunnel} = require("@bsscommerce/tunnel");
+const { useCloudflareTunnel } = require("@bsscommerce/tunnel");
 (async () => {
   const tunnelUrl = await useCloudflareTunnel(8001);
   console.log("Tunnel url: ", tunnelUrl)
@@ -24,7 +24,7 @@ const {useCloudflareTunnel} = require("@bsscommerce/tunnel");
 
 Using ngrok tunnel:
 ```javascript
-const {useNgrokTunnel} = require("@bsscommerce/tunnel");
+const { useNgrokTunnel } = require("@bsscommerce/tunnel");
 (async () => {
   const tunnelUrl = await useNgrokTunnel({
     port: 8001,

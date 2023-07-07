@@ -9,7 +9,7 @@ const getTunnelUrl = (data: string) => {
     }
 }
 
-export default function useCloudflareTunnel (port: number) {
+export default function useCloudflareTunnel(port: number) {
     return new Promise((resolve, reject) => {
         const childProcess = spawn(`${getBinPathTarget()}`, ['tunnel', '--url', `http://localhost:${port}`]);
 
