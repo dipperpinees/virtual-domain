@@ -1,5 +1,4 @@
+bin/
 node_modules/
 dist/
-configs.json
-certs/
-bin/
+ngrok_token.txt

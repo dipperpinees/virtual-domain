@@ -1,4 +1,5 @@
-#! /usr/bin/env node
-import startCommand from './cli';
+import useCloudflareTunnel from "./cloudflare";
+import useNgrokTunnel from "./ngrok";
+import useRandomTunnel from "./randomTunnel";
 
-startCommand();
+export {useCloudflareTunnel, useNgrokTunnel, useRandomTunnel};
