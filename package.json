@@ -19,6 +19,7 @@
         "prompt-sync": "^4.2.0"
     },
     "devDependencies": {
+        "@types/node": "^20.4.0",
         "@types/prompt-sync": "^4.2.0",
         "rimraf": "^5.0.1",
         "typescript": "^5.1.6"
