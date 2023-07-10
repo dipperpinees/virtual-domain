@@ -5,7 +5,7 @@ const getTunnelUrl = (data: string) => {
     const startUrl = "https://";
     const endUrl = ".trycloudflare.com";
     if (data.includes(startUrl) && data.includes(endUrl)) {
-        return data.substring(data.indexOf(startUrl), data.indexOf(endUrl) + ".trycloudflare.com".length)
+        return data.substring(data.indexOf(startUrl), data.indexOf(endUrl) + endUrl.length)
     }
 }
 
