@@ -24,11 +24,13 @@
     "dependencies": {
         "isomorphic-fetch": "^3.0.0",
         "ngrok": "^4.3.3",
-        "prompt-sync": "^4.2.0"
+        "prompt-sync": "^4.2.0",
+        "ssh2": "^1.14.0"
     },
     "devDependencies": {
         "@types/node": "^20.4.0",
         "@types/prompt-sync": "^4.2.0",
+        "@types/ssh2": "^1.11.13",
         "rimraf": "^5.0.1",
         "typescript": "^5.1.6"
     }

@@ -35,6 +35,30 @@ const { useNgrokTunnel } = require("@bss-sbc/tunnel");
 }) ()
 ```
 
+Using SSH tunnel:
+```javascript
+const { useSSHTunnel } = require("@bss-sbc/tunnel");
+(async () => {
+  await useSSHTunnel({
+    sshConfig: {
+      host: '192.168.100.100',
+      port: 22,
+      username: 'frylock',
+
+      // with private key
+      privateKey: readFileSync('/path/to/my/key'),
+
+      // with password
+      password: 'nodejsrules'
+    },
+    remoteHost, // optional, default is "127.0.0.1"
+    localHost, // optional, default is "127.0.0.1"
+    remotePort: 3000,
+    localPort: 3000
+  });
+}) ()
+```
+
 ## References:
 - <a href="https://shopify.dev/">Shopify Developer Documentation - Shopify's official developer documentation.</a>
 - <a href="https://www.cloudflare.com/">Cloudflare - Cloudflare's official website.</a>
