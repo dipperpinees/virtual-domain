@@ -51,8 +51,8 @@ const { useSSHTunnel } = require("@bss-sbc/tunnel");
       // with password
       password: 'nodejsrules'
     },
-    remoteHost, // optional, default is "127.0.0.1"
-    localHost, // optional, default is "127.0.0.1"
+    remoteHost: '127.0.0.1', // optional, default is "127.0.0.1"
+    localHost: '127.0.0.1', // optional, default is "127.0.0.1"
     remotePort: 3000,
     localPort: 3000
   });
