@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-      "target": "es5",
+      "target": "es6",
       "module": "commonJS",
       "declaration": true,
       "moduleResolution": "node",
@@ -8,5 +8,12 @@
       "strict": true,
       "esModuleInterop": true
   },
+  "types": [
+    "reflect-metadata",
+    "jest"
+  ],
+  "exclude": [
+    "node_modules", "**/*.spec.ts", "**/*.test.ts"
+  ],
   "include": ["src/**/*"]
 }

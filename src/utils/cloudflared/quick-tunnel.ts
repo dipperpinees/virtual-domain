@@ -1,5 +1,5 @@
 import { spawn } from 'child_process';
-import getBinPathTarget from './getBinPathTarget';
+import getBinPathTarget from '../get-bin-target';
 
 const getTunnelUrl = (data: string) => {
     const startUrl = "https://";
@@ -9,9 +9,9 @@ const getTunnelUrl = (data: string) => {
     }
 }
 
-export default function useCloudflareTunnel(port: number) {
+export default function useCloudflareQuickTunnel(port: number) {
     return new Promise((resolve, reject) => {
-        const childProcess = spawn(`${getBinPathTarget()}`, ['tunnel', '--url', `http://localhost:${port}`]);
+        const childProcess = spawn(`${getBinPathTarget()}`, ['tunnel', '--url', `http://localhost:${port}`], {shell: true});
 
         const handleStd = (data: Buffer) => {
             const tunnelUrl = getTunnelUrl(`${data}`);
