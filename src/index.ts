@@ -1,2 +1,2 @@
 
-export {useCloudflareQuickTunnel, CloudflareTunnel} from "./utils/cloudflared";
+export {useCloudflareTunnel, CloudflareTunnel} from "./utils/cloudflared";

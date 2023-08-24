@@ -5,7 +5,7 @@ const {execSync} = require('child_process')
 const {chmodSync, existsSync, mkdirSync, renameSync, unlinkSync, createWriteStream} = require('fs')
 require("isomorphic-fetch");
 
-const CLOUDFLARE_VERSION = '2023.7.3'
+const CLOUDFLARE_VERSION = '2023.8.0'
 const CLOUDFLARE_REPO = `https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARE_VERSION}/`
 
 const LINUX_URL = {

@@ -15,9 +15,9 @@ $ yarn add -D @bss-sbc/tunnel
 ## Usage
 Using Cloudflare quick tunnel:
 ```javascript
-const { useCloudflareQuickTunnel } = require("@bss-sbc/tunnel");
+const { useCloudflareTunnel } = require("@bss-sbc/tunnel");
 (async () => {
-  const tunnelUrl = await useCloudflareQuickTunnel(8001);
+  const tunnelUrl = await useCloudflareTunnel(8001);
   console.log("Tunnel url: ", tunnelUrl)
 }) ()
 ```
@@ -27,13 +27,24 @@ Using Cloudflare Zero Trust:
 const { CloudflareTunnel } = require("@bss-sbc/tunnel");
 
 const cfTunnel = new CloudflareTunnel({
-  certPath: 'home/hiepnguyen/.cloudflared/cert.pem',
-  credentialsPath: 'home/hiepnguyen/.cloudflared/abc-def.json',
-  hostname: 'foo.bar.com',
-  service: 'http://localhost:3000',
-  cfArgoName: 'foo',
-  debug: true,
-  unref: true
+  certPath: 'home/bar/.cloudflared/cert.pem',
+  cfAccountTag: 'daca032c1f89e3d5gfdg34dfg',
+  cfSecretKey: "k5meSe4CiZhC5IyJjDKOfsdxcvzbMGsVl66FK6CryWgQ=",
+  tunnelName: "my-tunnel",
+  tunnelOptions: {
+      connectTimeout: "25s",
+  },
+  tunnels: [
+      {
+          hostname: "abc.example.com",
+          service: "http://localhost:3000"
+      },
+      {
+          hostname: "bcd.example.com",
+          service: "http://localhost:3001"
+      }
+  ],
+  debug: true
 })
 
 cfTunnel.start();
@@ -41,6 +52,5 @@ cfTunnel.start();
 
 
 ## References:
-- <a href="https://shopify.dev/">Shopify Developer Documentation - Shopify's official developer documentation.</a>
-- <a href="https://www.cloudflare.com/">Cloudflare - Cloudflare's official website.</a>
+- <a href="https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/install-and-setup/tunnel-guide">Cloudflare Zero Trust</a>
 

@@ -1,78 +1,98 @@
 import { exec, spawn } from 'child_process';
-import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, writeFileSync } from 'fs';
 import path from 'path';
-import getBinPathTarget from '../get-bin-target';
 import util from 'util';
-
+import { IConfig } from '../../interfaces/cloudflared';
+import getBinPathTarget from '../get-bin-target';
+import { configSchema } from './schema';
 const execPromise = util.promisify(exec);
-
-interface IConfig {
-    cfAccountTag: string;
-    cfSecretKey: string;
-    certPath: string;
-    unref?: boolean;
-    hostname: string;
-    service: string;
-    debug?: boolean;
-    credentialsPath: string;
-}
 
 export default class CloudflareTunnel {
     config: IConfig;
-    TIME_OUT: number;
-    CONFIG_PATH: string;
-    BIN_PATH: string;
-    DNS_TEMP_PATH: string;
+    TIME_OUT: number = 20000;
+    CONFIG_PATH: string = path.join(__dirname, '../../../config.yaml');
+    BIN_PATH: string = getBinPathTarget();
+    tunnelID?: string;
+    credentialPath?: string;
 
     constructor(_config: IConfig) {
+        const { error } = configSchema.validate(_config);
+        if (error) {
+            throw new Error(JSON.stringify(error.details));
+        }
         this.config = _config;
-        this.TIME_OUT = 20000;
-        this.CONFIG_PATH = path.join(__dirname, '../../../config.yaml');
-        this.BIN_PATH = getBinPathTarget();
-        this.DNS_TEMP_PATH = path.join(__dirname, '../../../dns_temp.txt');
     }
 
     private createConfig() {
-        writeFileSync(
-            this.CONFIG_PATH,
-            `tunnel: ${this.config.hostname}
-credentials-file: ${this.config.credentialsPath}
-ingress:
-  - hostname: ${this.config.hostname}
-    service: ${this.config.service}
-  - service: ${this.config.service}
-    originRequest:
-      connectTimeout: 5s
-      keepAlive: 25s
-`
-        );
+        let configContent = `tunnel: ${this.config.tunnelName}\ncredentials-file: ${this.credentialPath}\n`;
+        if (this.config.tunnelOptions && Object.keys(this.config.tunnelOptions).length) {
+            configContent += `originRequest:\n`;
+            Object.keys(this.config.tunnelOptions).forEach(key => {
+                configContent += `  ${key}: ${this.config.tunnelOptions?.[key]}\n`
+            })
+        }
+        
+        configContent += 'ingress:\n';
+        this.config.tunnels.forEach(({hostname, service}) => {
+            configContent += `  - hostname: ${hostname}\n    service: ${service}\n`;
+        })
+        configContent += `  - service: http_status:404`;
+        writeFileSync(this.CONFIG_PATH, configContent);
     }
 
     private async createDNSRecord() {
         try {
-            await execPromise(`${this.BIN_PATH} tunnel route dns --overwrite-dns ${this.config.hostname} ${this.config.hostname}`, {
-                env: {
-                    TUNNEL_ORIGIN_CERT: this.config.certPath,
-                },
-            });
+            for (const { hostname } of this.config.tunnels) {
+                await execPromise(`${this.BIN_PATH} tunnel route dns --overwrite-dns ${this.tunnelID} ${hostname}`, {
+                    env: {
+                        TUNNEL_ORIGIN_CERT: this.config.certPath,
+                        NO_AUTOUPDATE: 'true',
+                    },
+                });
+            }
         } catch (err) {
             if (`${err}`.includes('ERR')) throw err;
         }
     }
 
-    async getTunnelID(name: string) {
-        const {stderr, stdout} = await execPromise(`${this.BIN_PATH} tunnel list`, {
+    private async createTunnel() {
+        const { stdout } = await execPromise(`${this.BIN_PATH} tunnel create ${this.config.tunnelName}`, {
             env: {
                 TUNNEL_ORIGIN_CERT: this.config.certPath,
+                TUNNEL_CREATE_SECRET: this.config.cfSecretKey,
+                NO_AUTOUPDATE: 'true',
             },
         });
-        stdout.split(/(\s+)/).filter(data => data.trim().length > 0)
+        return stdout.split(' ').slice(-1)[0].trim();
     }
 
-    public async start() {
-        this.createConfig();
-        await this.createDNSRecord();
+    private async getTunnelID() {
+        const { stdout } = await execPromise(`${this.BIN_PATH} tunnel list`, {
+            env: {
+                TUNNEL_ORIGIN_CERT: this.config.certPath,
+                NO_AUTOUPDATE: 'true',
+            },
+        });
+        const tunnelDataList = stdout.split(/(\s+)/).filter((data) => data.trim().length > 0);
+        const tunnelIndex = tunnelDataList.indexOf(this.config.tunnelName);
+        return tunnelDataList[tunnelIndex - 1]?.trim();
+    }
 
+    private createCredetials() {
+        this.credentialPath = path.join(path.dirname(this.config.certPath), `${this.tunnelID}.json`);
+        if (!existsSync(this.credentialPath)) {
+            writeFileSync(
+                this.credentialPath,
+                JSON.stringify({
+                    AccountTag: this.config.cfAccountTag,
+                    TunnelSecret: this.config.cfSecretKey,
+                    TunnelID: this.tunnelID,
+                })
+            );
+        }
+    }
+
+    private createTunnelConnection() {
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
                 reject(new Error('ERR_CONNECTION_TIMED_OUT'));
@@ -81,6 +101,7 @@ ingress:
                 shell: true,
                 env: {
                     TUNNEL_ORIGIN_CERT: this.config.certPath,
+                    NO_AUTOUPDATE: 'true',
                 },
             });
 
@@ -103,5 +124,17 @@ ingress:
 
             if (this.config.unref) childProcess.unref();
         });
+    }
+
+    public async start() {
+        this.tunnelID = await this.getTunnelID();
+        if (!this.tunnelID) {
+            this.tunnelID = await this.createTunnel();
+        }
+
+        await this.createDNSRecord();
+        this.createCredetials();
+        this.createConfig();
+        this.createTunnelConnection();
     }
 }
