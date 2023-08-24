@@ -14,6 +14,7 @@ export default class CloudflareTunnel {
     BIN_PATH: string = getBinPathTarget();
     tunnelID?: string;
     credentialPath?: string;
+    isStarted: boolean = false;
 
     constructor(_config: IConfig) {
         const { error } = configSchema.validate(_config);
@@ -106,9 +107,10 @@ export default class CloudflareTunnel {
             });
 
             const handleMessage = (message: string) => {
-                if (this.config.debug) console.log(message);
+                if (this.config.debug || !this.isStarted) console.log(message);
 
                 if (message.includes('Registered tunnel connection')) {
+                    this.isStarted = true;
                     clearTimeout(timeout);
                     resolve('Create tunnel successfully');
                 }
