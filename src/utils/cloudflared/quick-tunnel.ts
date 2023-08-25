@@ -23,9 +23,5 @@ export default function useCloudflareTunnel(port: number) {
         childProcess.stderr.on('data', handleStd);
 
         childProcess.unref();
-
-        process.on("exit", () => {
-            childProcess.pid && process.kill(childProcess.pid, 'SIGTERM');
-        })
     })
 }
