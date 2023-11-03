@@ -5,8 +5,7 @@ const {execSync} = require('child_process')
 const {chmodSync, existsSync, mkdirSync, renameSync, unlinkSync, createWriteStream} = require('fs')
 require("isomorphic-fetch");
 
-const CLOUDFLARE_VERSION = '2023.8.0'
-const CLOUDFLARE_REPO = `https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARE_VERSION}/`
+const CLOUDFLARED_RELEASE_API = `https://api.github.com/repos/cloudflare/cloudflared/releases/latest`
 
 const LINUX_URL = {
   arm64: 'cloudflared-linux-arm64',
@@ -25,12 +24,20 @@ const WINDOWS_URL = {
   ia32: 'cloudflared-windows-386.exe',
 }
 
-const URL = {
-  linux: CLOUDFLARE_REPO + LINUX_URL[process.arch],
-  darwin: CLOUDFLARE_REPO + MACOS_URL[process.arch],
-  win32: CLOUDFLARE_REPO + WINDOWS_URL[process.arch],
+function getURLs(cloudflaredRepo) {
+  return {
+    linux: cloudflaredRepo + LINUX_URL[process.arch],
+    darwin: cloudflaredRepo + MACOS_URL[process.arch],
+    win32: cloudflaredRepo + WINDOWS_URL[process.arch],
+  }
 }
 
+async function getLatestCloudflaredVersion() {
+  const response = await fetch(CLOUDFLARED_RELEASE_API);
+  if (!response.ok) throw new Error("Failed to get latest cloudflared");
+  const {name: version} = await response.json();
+  return version;
+}
 
 function getBinPathTarget() {
   return path.join(
@@ -40,7 +47,10 @@ function getBinPathTarget() {
 }
 
 async function install() {
-  const fileUrlPath = URL[process.platform]
+  const latestCloudflaredVersion = await getLatestCloudflaredVersion();
+  const cloudflaredRepo = `https://github.com/cloudflare/cloudflared/releases/download/${latestCloudflaredVersion}/`
+  const urls = getURLs(cloudflaredRepo);
+  const fileUrlPath = urls[process.platform]
   if (fileUrlPath === undefined) {
     throw new Error(`Unsupported system platform: ${process.platform} or arch: ${process.arch}`)
   }
